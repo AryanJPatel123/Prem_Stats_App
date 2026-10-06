@@ -5,7 +5,7 @@ interactive charts, and calculates match and season probabilities.
 
 **Disclaimer: The majority of the code provided here has been written by claude, apart from the mathematical functions and models which have been calculated and written by me, as well as some minor bug fixes when required. All sources for model calculations can be found at the end of this page.**
 
-**To View code written entirely by me, refer to Project Euler or Leetcode folders**
+**To View code written entirely by me, refer to Project Euler**
 
 **Requirements:** JDK 17 or newer. No other libraries — just Swing and the JDK HTTP client.
 
