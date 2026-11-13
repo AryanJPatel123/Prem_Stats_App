@@ -36,7 +36,7 @@ public class PlayersPanel extends JPanel implements ListTableModel.DataView {
 
     public PlayersPanel() {
         super(new BorderLayout(0, 10));
-        setBackground(Theme.SURFACE);
+        setBackground(Theme.PAGE);
         setBorder(Theme.padding(16));
 
         tableModel = new ListTableModel<>(List.of(

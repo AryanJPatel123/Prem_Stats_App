@@ -22,7 +22,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
-import javax.swing.UIManager;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -59,7 +58,7 @@ public class App extends JFrame {
         modelCheck = new ModelCheckPanel(this::applySettings);
         views = List.of(table, fixtures, players, charts, predictor, simulator, modelCheck);
 
-        tabs.setFont(Theme.BOLD);
+        tabs.setFont(Theme.SEMIBOLD);
         tabs.addTab("League Table", table);
         tabs.addTab("Fixtures & Results", fixtures);
         tabs.addTab("Players", players);
@@ -69,21 +68,34 @@ public class App extends JFrame {
         tabs.addTab("Model Check", modelCheck);
         tabs.setEnabled(false);
 
-        JPanel header = new JPanel(new BorderLayout());
+        // The header and the tab strip below it share the same purple, so they read as one bar.
+        JPanel header = new JPanel(new BorderLayout(14, 0));
         header.setBackground(Theme.HEADER);
-        header.setBorder(BorderFactory.createEmptyBorder(12, 18, 12, 18));
-        JPanel titles = new JPanel(new BorderLayout());
+        header.setBorder(BorderFactory.createEmptyBorder(14, 24, 6, 20));
+        JLabel mark = new JLabel() {
+            @Override protected void paintComponent(java.awt.Graphics g) {
+                java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
+                Theme.antialias(g2);
+                g2.setColor(Theme.HIGHLIGHT);
+                g2.fillRoundRect(0, 4, 6, getHeight() - 8, 6, 6);
+                g2.dispose();
+            }
+        };
+        mark.setPreferredSize(new Dimension(6, 40));
+        header.add(mark, BorderLayout.WEST);
+        JPanel titles = new JPanel(new BorderLayout(0, 2));
         titles.setOpaque(false);
-        titles.add(Theme.label("Premier League Stats", Theme.TITLE.deriveFont(20f), Color.WHITE), BorderLayout.NORTH);
+        titles.add(Theme.label("Premier League Stats", Theme.HERO.deriveFont(22f), Color.WHITE), BorderLayout.NORTH);
         titles.add(status, BorderLayout.SOUTH);
         header.add(titles, BorderLayout.CENTER);
-        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 6));
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 8));
         actions.setOpaque(false);
+        refresh.putClientProperty(pl.ui.Look.VARIANT, "onDark");
         actions.add(refresh);
         header.add(actions, BorderLayout.EAST);
         refresh.addActionListener(e -> load());
 
-        getContentPane().setBackground(Theme.SURFACE);
+        getContentPane().setBackground(Theme.PAGE);
         add(header, BorderLayout.NORTH);
         add(tabs, BorderLayout.CENTER);
     }
@@ -125,10 +137,7 @@ public class App extends JFrame {
     }
 
     public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ignored) { }
-        UIManager.put("ToolTip.font", Theme.SMALL);
+        pl.ui.Look.install();
         SwingUtilities.invokeLater(() -> {
             App app = new App();
             app.setVisible(true);

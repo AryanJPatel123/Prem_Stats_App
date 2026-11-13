@@ -54,7 +54,7 @@ public class ListTableModel<T> extends AbstractTableModel {
 
     public static JScrollPane scroll(JTable table) {
         JScrollPane sp = new JScrollPane(table);
-        sp.setBorder(javax.swing.BorderFactory.createLineBorder(Theme.GRID));
+        sp.setBorder(Theme.outline());
         sp.getViewport().setBackground(Theme.SURFACE);
         return sp;
     }

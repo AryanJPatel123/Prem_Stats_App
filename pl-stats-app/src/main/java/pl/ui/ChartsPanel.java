@@ -69,7 +69,7 @@ public class ChartsPanel extends JPanel implements ListTableModel.DataView {
 
     public ChartsPanel() {
         super(new BorderLayout(0, 10));
-        setBackground(Theme.SURFACE);
+        setBackground(Theme.PAGE);
         setBorder(Theme.padding(16));
 
         List<ChartDef> defs = List.of(
@@ -117,7 +117,7 @@ public class ChartsPanel extends JPanel implements ListTableModel.DataView {
         teamChecks.setLayout(new BoxLayout(teamChecks, BoxLayout.Y_AXIS));
         teamChecks.setBackground(Theme.SURFACE);
         JScrollPane checksScroll = new JScrollPane(teamChecks);
-        checksScroll.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Theme.GRID), "Teams (max 8)"));
+        checksScroll.setBorder(BorderFactory.createTitledBorder(Theme.outline(), "Teams (max 8)"));
         checksScroll.setPreferredSize(new java.awt.Dimension(190, 400));
 
         JPanel lineCard = new JPanel(new BorderLayout(10, 0));
@@ -126,7 +126,7 @@ public class ChartsPanel extends JPanel implements ListTableModel.DataView {
         lineCard.add(framed(line), BorderLayout.CENTER);
 
         JScrollPane barScroll = new JScrollPane(bar);
-        barScroll.setBorder(BorderFactory.createLineBorder(Theme.GRID));
+        barScroll.setBorder(Theme.outline());
         barScroll.getVerticalScrollBar().setUnitIncrement(16);
         cards.add(barScroll, "bar");
         cards.add(lineCard, "line");
@@ -144,7 +144,7 @@ public class ChartsPanel extends JPanel implements ListTableModel.DataView {
     }
 
     private static JComponent framed(JComponent c) {
-        c.setBorder(BorderFactory.createLineBorder(Theme.GRID));
+        c.setBorder(Theme.outline());
         return c;
     }
 

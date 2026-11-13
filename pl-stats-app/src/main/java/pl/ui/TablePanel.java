@@ -23,7 +23,7 @@ public class TablePanel extends JPanel implements ListTableModel.DataView {
 
     public TablePanel() {
         super(new BorderLayout(0, 10));
-        setBackground(Theme.SURFACE);
+        setBackground(Theme.PAGE);
         setBorder(Theme.padding(16));
 
         tableModel = new ListTableModel<>(List.of(

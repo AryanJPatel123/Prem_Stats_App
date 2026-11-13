@@ -53,7 +53,7 @@ public class OutcomeBar extends JComponent {
         g.setColor(cols[1]);
         g.fillRect(wH, barY, wD, barH);
         // 2px surface gaps between segments
-        g.setColor(Theme.SURFACE);
+        g.setColor(Theme.PAGE);
         g.fillRect(wH - 1, barY, 2, barH);
         g.fillRect(wH + wD - 1, barY, 2, barH);
 

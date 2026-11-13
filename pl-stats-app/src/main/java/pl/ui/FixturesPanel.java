@@ -43,7 +43,7 @@ public class FixturesPanel extends JPanel implements ListTableModel.DataView {
 
     public FixturesPanel(Consumer<Fixture> openInPredictor) {
         super(new BorderLayout(0, 10));
-        setBackground(Theme.SURFACE);
+        setBackground(Theme.PAGE);
         setBorder(Theme.padding(16));
 
         Theme.StripedRenderer centred = new Theme.StripedRenderer();

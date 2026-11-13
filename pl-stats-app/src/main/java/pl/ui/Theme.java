@@ -1,9 +1,11 @@
 package pl.ui;
 
 import javax.swing.BorderFactory;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -11,9 +13,12 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.LayoutManager;
 import java.awt.RenderingHints;
 
 /** Colours, fonts and table styling shared by every screen. */
@@ -21,15 +26,23 @@ public final class Theme {
     private Theme() { }
 
     // Surfaces and ink
-    public static final Color SURFACE = new Color(0xfcfcfb);
-    public static final Color PANEL = new Color(0xf4f3f0);
-    public static final Color TEXT = new Color(0x0b0b0b);
-    public static final Color TEXT_SECONDARY = new Color(0x52514e);
-    public static final Color TEXT_MUTED = new Color(0x8a8984);
-    public static final Color GRID = new Color(0xe6e5e1);
-    public static final Color ROW_ALT = new Color(0xf6f5f2);
-    public static final Color SELECTION = new Color(0xcde2fb);
-    public static final Color HEADER = new Color(0x37003c); // Premier League purple
+    public static final Color PAGE = new Color(0xf5f4f7);      // window background behind cards
+    public static final Color SURFACE = Color.WHITE;           // cards, tables, charts
+    public static final Color PANEL = new Color(0xf7f5f8);
+    public static final Color TEXT = new Color(0x1a1320);
+    public static final Color TEXT_SECONDARY = new Color(0x5b5463);
+    public static final Color TEXT_MUTED = new Color(0x8f8996);
+    public static final Color GRID = new Color(0xebe8ee);
+    public static final Color BORDER = new Color(0xdcd8e0);
+    public static final Color ROW_ALT = new Color(0xfaf9fb);
+    public static final Color SELECTION = new Color(0xefe4f2);
+    public static final Color HOVER = new Color(0xf4eff6);
+    public static final Color TRACK = new Color(0xe9e5ec);
+    public static final Color HEADER = new Color(0x37003c);       // Premier League purple
+    public static final Color ACCENT = HEADER;
+    public static final Color ACCENT_HOVER = new Color(0x51145a);
+    public static final Color ACCENT_SOFT = new Color(0xb995c1);
+    public static final Color HIGHLIGHT = new Color(0x00ff85);    // Premier League green
 
     /** Categorical series colours, assigned in this fixed order. */
     public static final Color[] SERIES = {
@@ -57,13 +70,23 @@ public final class Theme {
     public static final Color ZONE_EUROPE = new Color(0xeb6834);
     public static final Color ZONE_RELEGATION = new Color(0xe34948);
 
+    // Whole-point sizes only: fractional sizes make Segoe UI mis-space letters ("tim e") and clip labels.
     public static final Font BASE = new Font("Segoe UI", Font.PLAIN, 13);
     public static final Font BOLD = BASE.deriveFont(Font.BOLD);
-    public static final Font SMALL = BASE.deriveFont(11.5f);
-    public static final Font TITLE = BASE.deriveFont(Font.BOLD, 15f);
-    public static final Font HERO = BASE.deriveFont(Font.BOLD, 26f);
+    public static final Font SEMIBOLD = semibold(13);
+    public static final Font SMALL = BASE.deriveFont(12f);
+    public static final Font TITLE = semibold(17);
+    public static final Font HERO = BASE.deriveFont(Font.BOLD, 28f);
+
+    private static Font semibold(int size) {
+        Font f = new Font("Segoe UI Semibold", Font.PLAIN, size);
+        return f.getFamily().equals(Font.DIALOG) ? BASE.deriveFont(Font.BOLD, (float) size) : f;
+    }
 
     public static Border padding(int px) { return BorderFactory.createEmptyBorder(px, px, px, px); }
+
+    /** Hairline outline for scroll panes and charts sitting on the page background. */
+    public static Border outline() { return BorderFactory.createLineBorder(BORDER); }
 
     public static void antialias(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
@@ -97,11 +120,30 @@ public final class Theme {
         return String.format("%.1f%%", p * 100);
     }
 
+    /** A white card with a rounded hairline outline, for tiles and grouped content. */
+    public static class Card extends JPanel {
+        public Card(LayoutManager layout) {
+            super(layout);
+            setOpaque(false);
+            setBorder(BorderFactory.createEmptyBorder(10, 14, 10, 14));
+        }
+        @Override protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            antialias(g2);
+            g2.setColor(SURFACE);
+            g2.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 12, 12);
+            g2.setColor(BORDER);
+            g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 12, 12);
+            g2.dispose();
+        }
+    }
+
     // ------------------------------------------------------------------ tables
 
     public static void styleTable(JTable table) {
         table.setFont(BASE);
-        table.setRowHeight(26);
+        table.setRowHeight(30);
+        table.setIntercellSpacing(new Dimension(0, 0));
         table.setShowVerticalLines(false);
         table.setShowHorizontalLines(false);
         table.setGridColor(GRID);
@@ -116,9 +158,11 @@ public final class Theme {
         table.setDefaultRenderer(Double.class, new NumberRenderer("%.2f"));
 
         JTableHeader header = table.getTableHeader();
-        header.setFont(BOLD.deriveFont(12f));
+        header.setFont(SEMIBOLD.deriveFont(12f));
+        header.setBackground(SURFACE);
         header.setReorderingAllowed(false);
-        header.setDefaultRenderer(new HeaderRenderer(header.getDefaultRenderer()));
+        header.setDefaultRenderer(new HeaderRenderer());
+        header.setPreferredSize(new Dimension(0, 34));
     }
 
     public static class StripedRenderer extends DefaultTableCellRenderer {
@@ -153,32 +197,67 @@ public final class Theme {
         @Override protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             antialias(g);
-            int size = 18, gap = 3, x = 8, y = (getHeight() - size) / 2;
-            g.setFont(BOLD.deriveFont(10.5f));
+            int size = 18, gap = 4, x = 8, y = (getHeight() - size) / 2;
+            g.setFont(BOLD.deriveFont(11f));
+            FontMetrics fm = g.getFontMetrics();
             for (char c : form.toCharArray()) {
                 Color bg = c == 'W' ? GOOD : c == 'L' ? BAD : WARN;
                 g.setColor(bg);
-                g.fillRoundRect(x, y, size, size, 6, 6);
+                g.fillRoundRect(x, y, size, size, 9, 9);
                 g.setColor(Color.WHITE);
                 String s = String.valueOf(c);
-                int w = g.getFontMetrics().stringWidth(s);
-                g.drawString(s, x + (size - w) / 2, y + 13);
+                g.drawString(s, x + (size - fm.stringWidth(s)) / 2, y + (size - fm.getHeight()) / 2 + fm.getAscent());
                 x += size + gap;
             }
         }
     }
 
-    private static class HeaderRenderer implements TableCellRenderer {
-        private final TableCellRenderer delegate;
-        HeaderRenderer(TableCellRenderer delegate) { this.delegate = delegate; }
+    /** Flat column header: muted label aligned like its data, hairline underneath, arrow on the sorted column. */
+    private static class HeaderRenderer extends DefaultTableCellRenderer {
+        private final Border border = BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, BORDER), BorderFactory.createEmptyBorder(0, 8, 0, 8));
+        private SortOrder order;
+
         @Override
         public Component getTableCellRendererComponent(JTable t, Object v, boolean sel, boolean focus, int row, int col) {
-            Component c = delegate.getTableCellRendererComponent(t, v, sel, focus, row, col);
-            if (c instanceof JComponent jc) {
-                jc.setFont(BOLD.deriveFont(12f));
-                jc.setToolTipText("Click to sort by " + v);
+            super.getTableCellRendererComponent(t, v, false, false, row, col);
+            setFont(SEMIBOLD.deriveFont(12f));
+            setForeground(TEXT_SECONDARY);
+            setBackground(SURFACE);
+            setBorder(border);
+
+            TableCellRenderer cell = t.getColumnModel().getColumn(col).getCellRenderer();
+            if (cell == null) cell = t.getDefaultRenderer(t.getColumnClass(col));
+            int align = cell instanceof JLabel jl ? jl.getHorizontalAlignment() : LEFT;
+            if (align == LEADING) align = LEFT;
+            setHorizontalAlignment(align);
+            setHorizontalTextPosition(align == RIGHT ? LEFT : RIGHT);
+
+            order = null;
+            RowSorter<?> sorter = t.getRowSorter();
+            if (sorter != null) {
+                for (RowSorter.SortKey key : sorter.getSortKeys()) {
+                    if (key.getColumn() == t.convertColumnIndexToModel(col)) { order = key.getSortOrder(); break; }
+                }
             }
-            return c;
+            if (order == SortOrder.ASCENDING || order == SortOrder.DESCENDING) setForeground(TEXT);
+            else order = null;
+            setToolTipText("Click to sort by " + v);
+            return this;
+        }
+
+        /** The sorted column gets a purple underline and a small arrow above its label (takes no text width). */
+        @Override protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            if (order == null) return;
+            Graphics2D g2 = (Graphics2D) g.create();
+            antialias(g2);
+            g2.setColor(HEADER);
+            g2.fillRect(0, getHeight() - 2, getWidth(), 2);
+            int cx = getWidth() / 2, y = 3;
+            boolean up = order == SortOrder.ASCENDING;
+            g2.fillPolygon(new int[]{cx - 4, cx + 4, cx}, up ? new int[]{y + 4, y + 4, y} : new int[]{y, y, y + 4}, 3);
+            g2.dispose();
         }
     }
 }

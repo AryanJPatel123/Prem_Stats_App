@@ -33,7 +33,7 @@ public class SimulatorPanel extends JPanel implements ListTableModel.DataView {
     private final ListTableModel<TeamOutlook> tableModel;
     private final JTable table;
     private final JSpinner sims = new JSpinner(new SpinnerNumberModel(10000, 1000, 200000, 5000));
-    private final JButton run = new JButton("Run simulation");
+    private final JButton run = Look.primary(new JButton("Run simulation"));
     private final JProgressBar progress = new JProgressBar(0, 100);
     private final JComboBox<String> chartMetric = new JComboBox<>(new String[]{
             "Title chance", "Top-four chance", "Relegation chance", "Expected final points", "Selected team: finishing position"});
@@ -41,7 +41,7 @@ public class SimulatorPanel extends JPanel implements ListTableModel.DataView {
 
     public SimulatorPanel() {
         super(new BorderLayout(0, 10));
-        setBackground(Theme.SURFACE);
+        setBackground(Theme.PAGE);
         setBorder(Theme.padding(16));
 
         tableModel = new ListTableModel<>(List.of(
@@ -75,7 +75,7 @@ public class SimulatorPanel extends JPanel implements ListTableModel.DataView {
         chartMetric.addActionListener(e -> redrawChart());
 
         JScrollPane chartScroll = new JScrollPane(chart);
-        chartScroll.setBorder(BorderFactory.createLineBorder(Theme.GRID));
+        chartScroll.setBorder(Theme.outline());
         JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, ListTableModel.scroll(table), chartScroll);
         split.setResizeWeight(0.55);
         split.setBorder(null);

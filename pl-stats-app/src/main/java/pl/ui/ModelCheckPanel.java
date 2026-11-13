@@ -44,7 +44,7 @@ public class ModelCheckPanel extends JPanel implements ListTableModel.DataView {
 
     private final JComboBox<String> seasonBox = new JComboBox<>();
     private final JSpinner skip = new JSpinner(new SpinnerNumberModel(50, 0, 300, 10));
-    private final JButton run = new JButton("Run backtest");
+    private final JButton run = Look.primary(new JButton("Run backtest"));
     private final JProgressBar progress = new JProgressBar(0, 100);
 
     private final JComboBox<Object> halfLifeBox = new JComboBox<>(HALF_LIVES);
@@ -59,7 +59,7 @@ public class ModelCheckPanel extends JPanel implements ListTableModel.DataView {
     public ModelCheckPanel(Consumer<Settings> apply) {
         super(new BorderLayout(0, 10));
         this.apply = apply;
-        setBackground(Theme.SURFACE);
+        setBackground(Theme.PAGE);
         setBorder(Theme.padding(16));
 
         seasonBox.addItem(POOLED);
@@ -97,7 +97,7 @@ public class ModelCheckPanel extends JPanel implements ListTableModel.DataView {
         settingsRow.add(rhoBox);
         settingsRow.add(Theme.label("Shrinkage (phantom games)", Theme.SMALL, Theme.TEXT_SECONDARY));
         settingsRow.add(shrinkage);
-        JButton applyBtn = new JButton("Use for predictions");
+        JButton applyBtn = Look.primary(new JButton("Use for predictions"));
         applyBtn.setToolTipText("Refits the model with these settings and updates every tab");
         applyBtn.addActionListener(e -> apply.accept(selectedSettings()));
         settingsRow.add(applyBtn);
@@ -127,7 +127,7 @@ public class ModelCheckPanel extends JPanel implements ListTableModel.DataView {
                 new Col<Score>("Exact-score log loss", Double.class, 130, s -> nanToNull(s.scoreLogLoss()), four)
         ));
         JScrollPane chartScroll = new JScrollPane(chart);
-        chartScroll.setBorder(BorderFactory.createLineBorder(Theme.GRID));
+        chartScroll.setBorder(Theme.outline());
         JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, ListTableModel.scroll(tableModel.createTable()), chartScroll);
         split.setResizeWeight(0.45);
         split.setBorder(null);

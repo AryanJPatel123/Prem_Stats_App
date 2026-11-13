@@ -45,7 +45,7 @@ public class PredictorPanel extends JPanel implements ListTableModel.DataView {
 
     public PredictorPanel() {
         super(new BorderLayout(0, 10));
-        setBackground(Theme.SURFACE);
+        setBackground(Theme.PAGE);
         setBorder(Theme.padding(16));
 
         JPanel pick = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
@@ -97,7 +97,7 @@ public class PredictorPanel extends JPanel implements ListTableModel.DataView {
         JPanel matchArea = new JPanel(new BorderLayout(20, 0));
         matchArea.setOpaque(false);
         matchArea.add(left, BorderLayout.CENTER);
-        heatmap.setBorder(BorderFactory.createLineBorder(Theme.GRID));
+        heatmap.setBorder(Theme.outline());
         matchArea.add(heatmap, BorderLayout.EAST);
 
         // ---- bottom: gameweek predictions
@@ -244,11 +244,9 @@ public class PredictorPanel extends JPanel implements ListTableModel.DataView {
 
     /** A probability "stat tile": label, big number, and the fair decimal odds it implies. */
     private static JPanel card(String label, double p) {
-        JPanel c = new JPanel(new BorderLayout());
-        c.setBackground(Theme.PANEL);
-        c.setBorder(Theme.padding(10));
+        JPanel c = new Theme.Card(new BorderLayout(0, 2));
         c.add(Theme.label(label, Theme.SMALL, Theme.TEXT_SECONDARY), BorderLayout.NORTH);
-        c.add(Theme.label(Theme.pct(p), Theme.BASE.deriveFont(java.awt.Font.BOLD, 20f), Theme.TEXT), BorderLayout.CENTER);
+        c.add(Theme.label(Theme.pct(p), Theme.BASE.deriveFont(java.awt.Font.BOLD, 22f), Theme.TEXT), BorderLayout.CENTER);
         c.add(Theme.label(p > 0 ? String.format("Fair odds %.2f", 1 / p) : " ", Theme.SMALL, Theme.TEXT_MUTED),
                 BorderLayout.SOUTH);
         return c;
